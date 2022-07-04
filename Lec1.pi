@@ -1,0 +1,7 @@
+-- Simple examples demonstrating parametric polymorphism in core language
+
+module Lec1 where
+
+id : (x:Type) -> x -> x
+id = \x y . y 
+

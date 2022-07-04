@@ -1,0 +1,9 @@
+
+
+_ .     Expr ::= "(" Expr ")" ;
+E_Var.  Expr ::= Ident ;
+E_Abs.  Expr ::= "\\" Ident "." Expr ;
+E_App.  Expr ::= Expr Expr ;
+E_Pi.   Expr ::= "(" Ident ":" Expr ")" "->" Expr ;
+E_Type. Expr ::= "Type" ;
+E_Anno. Expr ::= "(" Expr ":" Expr ")";
