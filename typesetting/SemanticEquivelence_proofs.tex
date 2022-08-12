@@ -1,0 +1,803 @@
+\documentclass[12pt]{report}
+\usepackage[]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{fullpage}
+\usepackage{coqdoc}
+\usepackage{amsmath,amssymb}
+\usepackage{url}
+
+\begin{document}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% This file has been automatically generated with the command
+%% coqdoc --latex --preamble  ../SemanticEquivelence.v -o SemanticEquivelence_proofs.tex 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\coqlibrary{SemanticEquivelence}{Library }{SemanticEquivelence}
+
+\begin{coqdoccode}
+\coqdocemptyline
+\coqdocnoindent
+\coqdockw{Require} \coqdockw{Import} \coqdocvar{Coq.Init.Peano}.\coqdoceol
+\coqdocemptyline
+\coqdocnoindent
+\coqdockw{Require} \coqdockw{Import} \coqdocvar{Coq.Init.Nat}.\coqdoceol
+\coqdocnoindent
+\coqdockw{Require} \coqdockw{Import} \coqdocvar{Coq.Arith.EqNat}.\coqdoceol
+\coqdocnoindent
+\coqdockw{Require} \coqdockw{Import} \coqdocvar{Coq.Arith.PeanoNat}.\coqdoceol
+\coqdocemptyline
+\coqdocnoindent
+\coqdockw{Include} \coqdocvar{Coq.Init.Nat}.\coqdoceol
+\coqdocnoindent
+\coqdockw{Check} \coqdocvar{\_}/\coqdocvar{\_}.\coqdoceol
+\coqdocemptyline
+\coqdocnoindent
+\coqdockw{Require} \coqdockw{Import} \coqdocvar{List}.\coqdoceol
+\coqdocnoindent
+\coqdockw{Import} \coqdocvar{ListNotations}.\coqdoceol
+\coqdocnoindent
+\coqdockw{Check} [1].\coqdoceol
+\coqdocemptyline
+\coqdocnoindent
+\coqdockw{Definition} \coqdocvar{stack} := \coqdocvar{list} \coqdocvar{nat}.\coqdoceol
+\coqdocemptyline
+\coqdocnoindent
+\coqdockw{Inductive} \coqdocvar{bit} : \coqdockw{Set} :=\coqdoceol
+\coqdocindent{1.00em}
+\ensuremath{|} \coqdocvar{I} : \coqdocvar{bit}\coqdoceol
+\coqdocindent{1.00em}
+\ensuremath{|} \coqdocvar{O} : \coqdocvar{bit}.\coqdoceol
+\coqdocemptyline
+\coqdocnoindent
+\coqdockw{Definition} \coqdocvar{bitstr} := \coqdocvar{list} \coqdocvar{bit}.\coqdoceol
+\coqdocemptyline
+\coqdocnoindent
+\coqdockw{Inductive} \coqdocvar{expr} (\coqdocvar{ops} : \coqdockw{Set}) (\coqdocvar{lits} : \coqdockw{Set}) : \coqdockw{Set} :=\coqdoceol
+\coqdocindent{1.00em}
+\ensuremath{|} \coqdocvar{Lit} : \coqdocvar{lits} \ensuremath{\rightarrow} \coqdocvar{expr} \coqdocvar{ops} \coqdocvar{lits}\coqdoceol
+\coqdocindent{1.00em}
+\ensuremath{|} \coqdocvar{Bin} : \coqdocvar{ops} \ensuremath{\rightarrow} \coqdocvar{expr} \coqdocvar{ops} \coqdocvar{lits} \ensuremath{\rightarrow} \coqdocvar{expr} \coqdocvar{ops} \coqdocvar{lits} \ensuremath{\rightarrow} \coqdocvar{expr} \coqdocvar{ops} \coqdocvar{lits}.\coqdoceol
+\coqdocemptyline
+\coqdocnoindent
+\coqdockw{Arguments} \coqdocvar{Lit} \{\coqdocvar{ops}\} \{\coqdocvar{lits}\}.\coqdoceol
+\coqdocnoindent
+\coqdockw{Arguments} \coqdocvar{Bin} \{\coqdocvar{ops}\} \{\coqdocvar{lits}\}.\coqdoceol
+\coqdocemptyline
+\coqdocnoindent
+\coqdockw{Check} \coqdocvar{Lit} 1.\coqdoceol
+\coqdocemptyline
+\coqdocnoindent
+\coqdockw{Inductive} \coqdocvar{semantics} (\coqdocvar{L} : \coqdockw{Set}) (\coqdocvar{D} : \coqdockw{Set}) : \coqdockw{Type} := \coqdoceol
+\coqdocindent{1.00em}
+\coqdocvar{sem\_f} : (\coqdocvar{L} \ensuremath{\rightarrow} \coqdocvar{D}) \ensuremath{\rightarrow} \coqdocvar{semantics} \coqdocvar{L} \coqdocvar{D}.\coqdoceol
+\coqdocemptyline
+\coqdocnoindent
+\coqdockw{Arguments} \coqdocvar{sem\_f} \{\coqdocvar{L}\} \{\coqdocvar{D}\}.\coqdoceol
+\coqdocemptyline
+\coqdocnoindent
+\coqdockw{Inductive} \coqdocvar{semantic\_evaluation} \{\coqdocvar{L} \coqdocvar{D} : \coqdockw{Set}\} (\coqdocvar{sem} : \coqdocvar{L} \ensuremath{\rightarrow} \coqdocvar{D}) \ensuremath{|} (\coqdocvar{e} : \coqdocvar{L}) (\coqdocvar{d} : \coqdocvar{D}) : \coqdockw{Prop} \coqdoceol
+\coqdocindent{1.00em}
+:= \coqdocvar{sem\_eval} : \coqdocvar{sem} \coqdocvar{e} = \coqdocvar{d} \ensuremath{\rightarrow} \coqdocvar{semantic\_evaluation} \coqdocvar{e} \coqdocvar{d}.\coqdoceol
+\coqdocemptyline
+\coqdocnoindent
+\coqdockw{Definition} \coqdocvar{sem} \{\coqdocvar{L} \coqdocvar{D}\} (\coqdocvar{s} : \coqdocvar{semantics} \coqdocvar{L} \coqdocvar{D}) : \coqdocvar{L} \ensuremath{\rightarrow} \coqdocvar{D} := \coqdoceol
+\coqdocindent{1.00em}
+\coqdockw{let} '\coqdocvar{sem\_f} \coqdocvar{sem\_fun} := \coqdocvar{s} \coqdoctac{in} \coqdocvar{sem\_fun}.\coqdoceol
+\coqdocemptyline
+\coqdocemptyline
+\coqdocnoindent
+\coqdockw{Notation} "[[ x ]][ s ]" := (\coqdocvar{sem} \coqdocvar{s} \coqdocvar{x}).\coqdoceol
+\coqdocemptyline
+\coqdocnoindent
+\coqdockw{Fixpoint} \coqdocvar{expr\_semantics'} \coqdoceol
+\coqdocindent{1.00em}
+\{\coqdocvar{ops} \coqdocvar{lits} : \coqdockw{Set}\} \{\coqdocvar{D} : \coqdockw{Set}\} (\coqdocvar{sem\_lit} : \coqdocvar{lits} \ensuremath{\rightarrow} \coqdocvar{D}) \coqdoceol
+\coqdocindent{1.00em}
+(\coqdocvar{sem\_op} : \coqdocvar{ops} \ensuremath{\rightarrow} \coqdocvar{D} \ensuremath{\rightarrow} \coqdocvar{D} \ensuremath{\rightarrow} \coqdocvar{D}) (\coqdocvar{e} : \coqdocvar{expr} \coqdocvar{ops} \coqdocvar{lits}) : \coqdocvar{D} :=\coqdoceol
+\coqdocindent{1.00em}
+\coqdockw{let} \coqdocvar{expr\_sem} := \coqdocvar{expr\_semantics'} \coqdocvar{sem\_lit} \coqdocvar{sem\_op} \coqdoctac{in}\coqdoceol
+\coqdocindent{2.00em}
+\coqdockw{match} \coqdocvar{e} \coqdockw{with}\coqdoceol
+\coqdocindent{3.00em}
+\ensuremath{|} \coqdocvar{Lit} \coqdocvar{x}  \ensuremath{\Rightarrow} \coqdocvar{sem\_lit} \coqdocvar{x}\coqdoceol
+\coqdocindent{3.00em}
+\ensuremath{|} \coqdocvar{Bin} \coqdocvar{op} \coqdocvar{e1} \coqdocvar{e2} \ensuremath{\Rightarrow} \coqdocvar{sem\_op} \coqdocvar{op} (\coqdocvar{expr\_sem} \coqdocvar{e1}) (\coqdocvar{expr\_sem} \coqdocvar{e2})\coqdoceol
+\coqdocindent{3.00em}
+\coqdockw{end}.\coqdoceol
+\coqdocemptyline
+\coqdocnoindent
+\coqdockw{Definition} \coqdocvar{expr\_semantics} \coqdoceol
+\coqdocindent{1.00em}
+\{\coqdocvar{ops} \coqdocvar{lits} \coqdocvar{D} : \coqdockw{Set}\} (\coqdocvar{sem\_lit} : \coqdocvar{lits} \ensuremath{\rightarrow} \coqdocvar{D}) (\coqdocvar{sem\_op} : \coqdocvar{ops} \ensuremath{\rightarrow} \coqdocvar{D} \ensuremath{\rightarrow} \coqdocvar{D} \ensuremath{\rightarrow} \coqdocvar{D}) : \coqdocvar{semantics} (\coqdocvar{expr} \coqdocvar{ops} \coqdocvar{lits}) \coqdocvar{D} :=\coqdoceol
+\coqdocindent{1.00em}
+\coqdocvar{sem\_f} (\coqdocvar{expr\_semantics'} \coqdocvar{sem\_lit} \coqdocvar{sem\_op}).\coqdoceol
+\coqdocemptyline
+\coqdocemptyline
+\coqdocnoindent
+\coqdockw{Inductive} \coqdocvar{expr\_semantics\_definition} (\coqdocvar{lits} \coqdocvar{ops} \coqdocvar{D} : \coqdockw{Set}) : \coqdockw{Set} := \coqdoceol
+\coqdocindent{1.00em}
+\ensuremath{|} \coqdocvar{expr\_sem\_def\_parts} : \coqdockw{\ensuremath{\forall}} (\coqdocvar{sem\_lit} : \coqdocvar{lits} \ensuremath{\rightarrow} \coqdocvar{D}) (\coqdocvar{sem\_op} : \coqdocvar{ops} \ensuremath{\rightarrow} \coqdocvar{D} \ensuremath{\rightarrow} \coqdocvar{D} \ensuremath{\rightarrow} \coqdocvar{D}), \coqdocvar{expr\_semantics\_definition} \coqdocvar{lits} \coqdocvar{ops} \coqdocvar{D}.\coqdoceol
+\coqdocemptyline
+\coqdocnoindent
+\coqdockw{Inductive} \coqdocvar{bin\_ops} : \coqdockw{Set} := \coqdocvar{bin\_add}.\coqdoceol
+\coqdocemptyline
+\coqdocnoindent
+\coqdockw{Definition} \coqdocvar{expr\_bits} := \coqdocvar{expr} \coqdocvar{bin\_ops} \coqdocvar{bitstr}.\coqdoceol
+\coqdocemptyline
+\coqdocnoindent
+\coqdockw{Fixpoint} \coqdocvar{expr\_bits\_sem\_lits} (\coqdocvar{bs} : \coqdocvar{bitstr}) : \coqdocvar{nat} :=\coqdoceol
+\coqdocindent{1.00em}
+\coqdockw{match} \coqdocvar{bs} \coqdockw{with}\coqdoceol
+\coqdocindent{2.00em}
+\ensuremath{|} \coqdocvar{I} :: \coqdocvar{bs'} \ensuremath{\Rightarrow} 1 + (2 \ensuremath{\times} \coqdocvar{expr\_bits\_sem\_lits} \coqdocvar{bs'})\coqdoceol
+\coqdocindent{2.00em}
+\ensuremath{|} \coqdocvar{O} :: \coqdocvar{bs'} \ensuremath{\Rightarrow} 2 \ensuremath{\times} \coqdocvar{expr\_bits\_sem\_lits} \coqdocvar{bs'}\coqdoceol
+\coqdocindent{2.00em}
+\ensuremath{|} []       \ensuremath{\Rightarrow} 0\coqdoceol
+\coqdocindent{2.00em}
+\coqdockw{end}.\coqdoceol
+\coqdocemptyline
+\coqdocnoindent
+\coqdockw{Definition} \coqdocvar{expr\_bits\_sem\_op} (\coqdocvar{o} : \coqdocvar{bin\_ops}) : \coqdocvar{nat} \ensuremath{\rightarrow} \coqdocvar{nat} \ensuremath{\rightarrow} \coqdocvar{nat} :=\coqdoceol
+\coqdocindent{1.00em}
+\coqdockw{match} \coqdocvar{o} \coqdockw{with}\coqdoceol
+\coqdocindent{2.00em}
+\ensuremath{|} \coqdocvar{bin\_add} \ensuremath{\Rightarrow} \coqdockw{fun} \coqdocvar{a} \coqdocvar{b} \ensuremath{\Rightarrow} \coqdocvar{a} + \coqdocvar{b}\coqdoceol
+\coqdocindent{2.00em}
+\coqdockw{end}.\coqdoceol
+\coqdocemptyline
+\coqdocnoindent
+\coqdockw{Definition} \coqdocvar{bin\_expr\_sems} := \coqdocvar{expr\_semantics} \coqdocvar{expr\_bits\_sem\_lits} \coqdocvar{expr\_bits\_sem\_op}.\coqdoceol
+\coqdocemptyline
+\coqdocnoindent
+\coqdockw{Check} \coqdocvar{bin\_expr\_sems} : \coqdocvar{semantics} \coqdocvar{expr\_bits} \coqdocvar{nat}.\coqdoceol
+\coqdocemptyline
+\coqdocnoindent
+\coqdockw{Definition} \coqdocvar{eval\_expr} := \coqdocvar{expr\_semantics'} \coqdocvar{expr\_bits\_sem\_lits} \coqdocvar{expr\_bits\_sem\_op}.\coqdoceol
+\coqdocemptyline
+\coqdocnoindent
+\coqdockw{Compute} (\coqdocvar{sem} \coqdocvar{bin\_expr\_sems} (\coqdocvar{Lit} [\coqdocvar{I}])).\coqdoceol
+\coqdocnoindent
+\coqdockw{Compute} (\coqdocvar{eval\_expr} (\coqdocvar{Lit} [\coqdocvar{I}])).\coqdoceol
+\coqdocemptyline
+\coqdocnoindent
+\coqdockw{Fixpoint} \coqdocvar{bits\_to\_nat} (\coqdocvar{b} : \coqdocvar{bitstr}) : \coqdocvar{nat} :=\coqdoceol
+\coqdocindent{1.00em}
+\coqdockw{match} \coqdocvar{b} \coqdockw{with}\coqdoceol
+\coqdocindent{2.00em}
+\ensuremath{|} \coqdocvar{I} :: \coqdocvar{b'} \ensuremath{\Rightarrow} \coqdocvar{S} (2 \ensuremath{\times} \coqdocvar{bits\_to\_nat} \coqdocvar{b'})\coqdoceol
+\coqdocindent{2.00em}
+\ensuremath{|} \coqdocvar{O} :: \coqdocvar{b'} \ensuremath{\Rightarrow} (2 \ensuremath{\times} \coqdocvar{bits\_to\_nat} \coqdocvar{b'})\coqdoceol
+\coqdocindent{2.00em}
+\ensuremath{|} []      \ensuremath{\Rightarrow} 0\coqdoceol
+\coqdocindent{2.00em}
+\coqdockw{end}.\coqdoceol
+\coqdocemptyline
+\coqdocnoindent
+\coqdockw{Definition} \coqdocvar{nat\_to\_bit} (\coqdocvar{n} : \coqdocvar{nat}) : \coqdocvar{bit} := \coqdoceol
+\coqdocindent{1.00em}
+\coqdockw{match} \coqdocvar{n} \coqdockw{with}\coqdoceol
+\coqdocindent{2.00em}
+\ensuremath{|} 0 \ensuremath{\Rightarrow} \coqdocvar{O}\coqdoceol
+\coqdocindent{2.00em}
+\ensuremath{|} 1 \ensuremath{\Rightarrow} \coqdocvar{I}\coqdoceol
+\coqdocindent{2.00em}
+\ensuremath{|} \coqdocvar{\_} \ensuremath{\Rightarrow} \coqdocvar{O}\coqdoceol
+\coqdocindent{1.00em}
+\coqdockw{end}.\coqdoceol
+\coqdocemptyline
+\coqdocnoindent
+\coqdockw{Fixpoint} \coqdocvar{bit\_inc} (\coqdocvar{bs} : \coqdocvar{bitstr}) : \coqdocvar{bitstr} :=\coqdoceol
+\coqdocindent{1.00em}
+\coqdockw{match} \coqdocvar{bs} \coqdockw{with}\coqdoceol
+\coqdocindent{2.00em}
+\ensuremath{|} []       \ensuremath{\Rightarrow} [\coqdocvar{I}]\coqdoceol
+\coqdocindent{2.00em}
+\ensuremath{|} \coqdocvar{I} :: \coqdocvar{bs'} \ensuremath{\Rightarrow} \coqdocvar{O} :: \coqdocvar{bit\_inc} \coqdocvar{bs'}\coqdoceol
+\coqdocindent{2.00em}
+\ensuremath{|} \coqdocvar{O} :: \coqdocvar{bs'} \ensuremath{\Rightarrow} \coqdocvar{I} :: \coqdocvar{bs'}\coqdoceol
+\coqdocindent{2.00em}
+\coqdockw{end}.\coqdoceol
+\coqdocemptyline
+\coqdocnoindent
+\coqdockw{Fixpoint} \coqdocvar{nat\_to\_bits} (\coqdocvar{n} : \coqdocvar{nat}) : \coqdocvar{bitstr} :=\coqdoceol
+\coqdocindent{1.00em}
+\coqdockw{match} \coqdocvar{n} \coqdockw{with}\coqdoceol
+\coqdocindent{2.00em}
+\ensuremath{|} 0    \ensuremath{\Rightarrow} [\coqdocvar{O}]\coqdoceol
+\coqdocindent{2.00em}
+\ensuremath{|} \coqdocvar{S} \coqdocvar{n'} \ensuremath{\Rightarrow} \coqdocvar{bit\_inc} (\coqdocvar{nat\_to\_bits} \coqdocvar{n'})\coqdoceol
+\coqdocindent{2.00em}
+\coqdockw{end}.\coqdoceol
+\coqdocemptyline
+\coqdocnoindent
+\coqdockw{Compute} \coqdocvar{bits\_to\_nat} (\coqdocvar{I} :: \coqdocvar{I} :: \coqdocvar{O} :: []).\coqdoceol
+\coqdocemptyline
+\coqdocnoindent
+\coqdockw{Compute} \coqdocvar{nat\_to\_bits} 4.\coqdoceol
+\coqdocemptyline
+\coqdocnoindent
+\coqdockw{Lemma} \coqdocvar{bits\_to\_nat\_function} : \coqdockw{\ensuremath{\forall}} (\coqdocvar{b1} \coqdocvar{b2} : \coqdocvar{bitstr}), \coqdocvar{b1} = \coqdocvar{b2} \ensuremath{\rightarrow} \coqdocvar{bits\_to\_nat} \coqdocvar{b1} = \coqdocvar{bits\_to\_nat} \coqdocvar{b2}.\coqdoceol
+\coqdocnoindent
+\coqdockw{Proof}.\coqdoceol
+\coqdocindent{1.00em}
+\coqdoctac{intros} \coqdocvar{b1} \coqdocvar{b2}.\coqdoceol
+\coqdocindent{1.00em}
+\coqdoctac{destruct} \coqdocvar{b1}.\coqdoceol
+\coqdocindent{1.00em}
+\coqdoctac{intros}. \coqdoctac{rewrite} \coqdocvar{H}. \coqdoctac{reflexivity}.\coqdoceol
+\coqdocindent{1.00em}
+\coqdoctac{destruct} \coqdocvar{b2}.\coqdoceol
+\coqdocindent{1.00em}
+\coqdoctac{intros}. \coqdoctac{rewrite} \coqdocvar{H}. \coqdoctac{reflexivity}.\coqdoceol
+\coqdocindent{1.00em}
+\coqdoctac{intros}. \coqdoctac{rewrite} \coqdocvar{H}. \coqdoctac{reflexivity}.\coqdoceol
+\coqdocnoindent
+\coqdockw{Qed}.\coqdoceol
+\coqdocemptyline
+\coqdocnoindent
+\coqdockw{Fixpoint} \coqdocvar{bit\_add} (\coqdocvar{b1} \coqdocvar{b2} : \coqdocvar{bitstr}) : \coqdocvar{bitstr} :=\coqdoceol
+\coqdocindent{1.00em}
+\coqdockw{match} \coqdocvar{b1},\coqdocvar{b2} \coqdockw{with}\coqdoceol
+\coqdocindent{2.00em}
+\ensuremath{|} \coqdocvar{I} :: \coqdocvar{b1'}, \coqdocvar{b} :: \coqdocvar{b2'} \ensuremath{\Rightarrow} \coqdocvar{bit\_inc} (\coqdocvar{b} :: \coqdocvar{bit\_add} \coqdocvar{b1'} \coqdocvar{b2'})\coqdoceol
+\coqdocindent{2.00em}
+\ensuremath{|} \coqdocvar{O} :: \coqdocvar{b1'}, \coqdocvar{b} :: \coqdocvar{b2'} \ensuremath{\Rightarrow} \coqdocvar{b} :: \coqdocvar{bit\_add} \coqdocvar{b1'} \coqdocvar{b2'}\coqdoceol
+\coqdocindent{2.00em}
+\ensuremath{|} [],\coqdocvar{\_}               \ensuremath{\Rightarrow} \coqdocvar{b2}\coqdoceol
+\coqdocindent{2.00em}
+\ensuremath{|} \coqdocvar{\_},[]               \ensuremath{\Rightarrow} \coqdocvar{b1}\coqdoceol
+\coqdocindent{2.00em}
+\coqdockw{end}.\coqdoceol
+\coqdocemptyline
+\coqdocnoindent
+\coqdockw{Notation} "x +.+ y" := (\coqdocvar{bit\_add} \coqdocvar{x} \coqdocvar{y}) (\coqdoctac{at} \coqdockw{level} 40, \coqdoctac{left} \coqdockw{associativity}).\coqdoceol
+\coqdocemptyline
+\coqdocnoindent
+\coqdockw{Compute} \coqdocvar{bit\_add} (\coqdocvar{nat\_to\_bits} 100) (\coqdocvar{nat\_to\_bits} 23).\coqdoceol
+\coqdocnoindent
+\coqdockw{Compute} \coqdocvar{bits\_to\_nat} (\coqdocvar{bit\_add} (\coqdocvar{nat\_to\_bits} 100) (\coqdocvar{nat\_to\_bits} 23)).\coqdoceol
+\coqdocemptyline
+\coqdocnoindent
+\coqdockw{Definition} \coqdocvar{binary} := \coqdocvar{bitstr}.\coqdoceol
+\coqdocemptyline
+\coqdocnoindent
+\coqdockw{Lemma} \coqdocvar{binary\_add\_unit\_left} : \coqdockw{\ensuremath{\forall}} (\coqdocvar{b} : \coqdocvar{binary}), \coqdocvar{b} +.+ [] = \coqdocvar{b}.\coqdoceol
+\coqdocnoindent
+\coqdockw{Proof}.\coqdoceol
+\coqdocindent{1.00em}
+\coqdoctac{intros} \coqdocvar{b}.\coqdoceol
+\coqdocindent{1.00em}
+\coqdoctac{induction} \coqdocvar{b}.\coqdoceol
+\coqdocindent{1.00em}
+- \coqdoctac{simpl}. \coqdoctac{reflexivity}.\coqdoceol
+\coqdocindent{1.00em}
+- \coqdoctac{simpl}. \coqdoctac{destruct} \coqdocvar{a}. \coqdocvar{all}: \coqdoctac{reflexivity}.\coqdoceol
+\coqdocnoindent
+\coqdockw{Qed}.\coqdoceol
+\coqdocemptyline
+\coqdocnoindent
+\coqdockw{Lemma} \coqdocvar{binary\_add\_unit\_right} : \coqdockw{\ensuremath{\forall}} (\coqdocvar{b} : \coqdocvar{binary}), [] +.+ \coqdocvar{b} = \coqdocvar{b}.\coqdoceol
+\coqdocnoindent
+\coqdockw{Proof}.\coqdoceol
+\coqdocindent{1.00em}
+\coqdoctac{intros} \coqdocvar{b}.\coqdoceol
+\coqdocindent{1.00em}
+\coqdoctac{induction} \coqdocvar{b}.\coqdoceol
+\coqdocindent{1.00em}
+- \coqdoctac{simpl}. \coqdoctac{reflexivity}.\coqdoceol
+\coqdocindent{1.00em}
+- \coqdoctac{simpl}. \coqdoctac{destruct} \coqdocvar{a}. \coqdocvar{all}: \coqdoctac{reflexivity}.\coqdoceol
+\coqdocnoindent
+\coqdockw{Qed}.\coqdoceol
+\coqdocemptyline
+\coqdocnoindent
+\coqdockw{Lemma} \coqdocvar{binary\_add\_id\_left} : \coqdoctac{\ensuremath{\exists}} (\coqdocvar{e} : \coqdocvar{binary}), \coqdockw{\ensuremath{\forall}} (\coqdocvar{b} : \coqdocvar{binary}), \coqdocvar{e} +.+ \coqdocvar{b} = \coqdocvar{b}.\coqdoceol
+\coqdocnoindent
+\coqdockw{Proof}.\coqdoceol
+\coqdocindent{1.00em}
+\coqdoctac{\ensuremath{\exists}} [].\coqdoceol
+\coqdocindent{1.00em}
+\coqdoctac{intros}.\coqdoceol
+\coqdocindent{1.00em}
+\coqdoctac{simpl}.\coqdoceol
+\coqdocindent{1.00em}
+\coqdoctac{reflexivity}.\coqdoceol
+\coqdocnoindent
+\coqdockw{Qed}.\coqdoceol
+\coqdocemptyline
+\coqdocnoindent
+\coqdockw{Lemma} \coqdocvar{binary\_add\_id\_right} : \coqdoctac{\ensuremath{\exists}} (\coqdocvar{e} : \coqdocvar{binary}), \coqdockw{\ensuremath{\forall}} (\coqdocvar{b} : \coqdocvar{binary}), \coqdocvar{b} +.+ \coqdocvar{e} = \coqdocvar{b}.\coqdoceol
+\coqdocnoindent
+\coqdockw{Proof}.\coqdoceol
+\coqdocindent{1.00em}
+\coqdoctac{\ensuremath{\exists}} [].\coqdoceol
+\coqdocindent{1.00em}
+\coqdoctac{intros}.\coqdoceol
+\coqdocindent{1.00em}
+\coqdoctac{induction} \coqdocvar{b}.\coqdoceol
+\coqdocindent{1.00em}
+- \coqdoctac{simpl}. \coqdoctac{reflexivity}.\coqdoceol
+\coqdocindent{1.00em}
+- \coqdoctac{simpl}. \coqdoctac{destruct} \coqdocvar{a}. \coqdocvar{all}: \coqdoctac{reflexivity}.\coqdoceol
+\coqdocnoindent
+\coqdockw{Qed}.\coqdoceol
+\coqdocemptyline
+\coqdocemptyline
+\coqdocnoindent
+\coqdockw{Lemma} \coqdocvar{add\_id} : \coqdockw{\ensuremath{\forall}} (\coqdocvar{n} : \coqdocvar{nat}), \coqdocvar{n} + 0 = \coqdocvar{n}.\coqdoceol
+\coqdocnoindent
+\coqdockw{Proof}.\coqdoceol
+\coqdocindent{1.00em}
+\coqdoctac{intros} \coqdocvar{n}.\coqdoceol
+\coqdocindent{1.00em}
+\coqdoctac{apply} \coqdocvar{Nat.add\_comm}.\coqdoceol
+\coqdocnoindent
+\coqdockw{Qed}.\coqdoceol
+\coqdocemptyline
+\coqdocnoindent
+\coqdockw{Lemma} \coqdocvar{add\_succ\_assoc} : \coqdockw{\ensuremath{\forall}} (\coqdocvar{n} \coqdocvar{m} : \coqdocvar{nat}), \coqdocvar{S} (\coqdocvar{n} + \coqdocvar{m}) = (\coqdocvar{S} \coqdocvar{n}) + \coqdocvar{m}.\coqdoceol
+\coqdocnoindent
+\coqdockw{Proof}.\coqdoceol
+\coqdocindent{1.00em}
+\coqdoctac{auto}.\coqdoceol
+\coqdocnoindent
+\coqdockw{Qed}.\coqdoceol
+\coqdocemptyline
+\coqdocnoindent
+\coqdockw{Lemma} \coqdocvar{bits\_nat\_succ\_eq} : \coqdockw{\ensuremath{\forall}} (\coqdocvar{n} : \coqdocvar{nat}), \coqdocvar{bit\_inc} (\coqdocvar{nat\_to\_bits} \coqdocvar{n}) = \coqdocvar{nat\_to\_bits} (\coqdocvar{S} \coqdocvar{n}).\coqdoceol
+\coqdocnoindent
+\coqdockw{Proof}.\coqdoceol
+\coqdocindent{1.00em}
+\coqdoctac{induction} \coqdocvar{n}.\coqdoceol
+\coqdocindent{1.00em}
+\coqdoctac{simpl}. \coqdoctac{reflexivity}.\coqdoceol
+\coqdocindent{1.00em}
+\coqdoctac{simpl}. \coqdoctac{reflexivity}.\coqdoceol
+\coqdocnoindent
+\coqdockw{Qed}.\coqdoceol
+\coqdocemptyline
+\coqdocnoindent
+\coqdockw{Lemma} \coqdocvar{nat\_bits\_succ\_eq} : \coqdockw{\ensuremath{\forall}} (\coqdocvar{b} : \coqdocvar{bitstr}), \coqdocvar{S} (\coqdocvar{bits\_to\_nat} \coqdocvar{b}) = \coqdocvar{bits\_to\_nat} (\coqdocvar{bit\_inc} \coqdocvar{b}).\coqdoceol
+\coqdocnoindent
+\coqdockw{Proof}.\coqdoceol
+\coqdocindent{1.00em}
+\coqdoctac{intros} \coqdocvar{b}.\coqdoceol
+\coqdocindent{1.00em}
+\coqdoctac{induction} \coqdocvar{b}.\coqdoceol
+\coqdocindent{1.50em}
+- \coqdoctac{simpl}. \coqdoctac{reflexivity}.\coqdoceol
+\coqdocindent{1.50em}
+- \coqdoctac{pose} \coqdocvar{proof} (\coqdocvar{bits\_nat\_succ\_eq} (\coqdocvar{bits\_to\_nat} \coqdocvar{b})) \coqdockw{as} \coqdocvar{H}.\coqdoceol
+\coqdocindent{1.50em}
+\coqdoctac{destruct} \coqdocvar{a}.\coqdoceol
+\coqdocindent{1.50em}
+\coqdocvar{all}: \coqdoctac{simpl}.\coqdoceol
+\coqdocindent{1.50em}
+\coqdocvar{all}: \coqdoctac{rewrite} (\coqdocvar{add\_id} (\coqdocvar{bits\_to\_nat} \coqdocvar{b})).\coqdoceol
+\coqdocindent{1.50em}
+\coqdocvar{all}: \coqdoctac{try} \coqdoctac{reflexivity}.\coqdoceol
+\coqdocindent{1.50em}
+\coqdoctac{rewrite} (\coqdocvar{add\_id} (\coqdocvar{bits\_to\_nat} (\coqdocvar{bit\_inc} \coqdocvar{b}))).\coqdoceol
+\coqdocindent{1.50em}
+\coqdoctac{rewrite} \ensuremath{\leftarrow} \coqdocvar{IHb}.\coqdoceol
+\coqdocindent{1.50em}
+\coqdoctac{pose} \coqdocvar{proof} (\coqdocvar{add\_succ\_assoc} (\coqdocvar{bits\_to\_nat} \coqdocvar{b}) (\coqdocvar{S} (\coqdocvar{bits\_to\_nat} \coqdocvar{b}))) \coqdockw{as} \coqdocvar{H2}.\coqdoceol
+\coqdocindent{1.50em}
+\coqdoctac{pose} \coqdocvar{proof} (\coqdocvar{add\_succ\_assoc} (\coqdocvar{S} (\coqdocvar{bits\_to\_nat} \coqdocvar{b})) (\coqdocvar{bits\_to\_nat} \coqdocvar{b})) \coqdockw{as} \coqdocvar{H3}.\coqdoceol
+\coqdocindent{1.50em}
+\coqdoctac{rewrite} \ensuremath{\leftarrow} \coqdocvar{H2}.\coqdoceol
+\coqdocindent{1.50em}
+\coqdoctac{pose} \coqdocvar{proof} (\coqdocvar{Nat.add\_comm} (\coqdocvar{bits\_to\_nat} \coqdocvar{b}) (\coqdocvar{S} (\coqdocvar{bits\_to\_nat} \coqdocvar{b}))) \coqdockw{as} \coqdocvar{H4}.\coqdoceol
+\coqdocindent{1.50em}
+\coqdoctac{rewrite} \ensuremath{\rightarrow} \coqdocvar{H4}.\coqdoceol
+\coqdocindent{1.50em}
+\coqdoctac{pose} \coqdocvar{proof} (\coqdocvar{add\_succ\_assoc} (\coqdocvar{bits\_to\_nat} \coqdocvar{b}) (\coqdocvar{bits\_to\_nat} \coqdocvar{b})) \coqdockw{as} \coqdocvar{H5}.\coqdoceol
+\coqdocindent{1.50em}
+\coqdoctac{rewrite} \ensuremath{\leftarrow} \coqdocvar{H5}.\coqdoceol
+\coqdocindent{1.50em}
+\coqdoctac{reflexivity}.\coqdoceol
+\coqdocnoindent
+\coqdockw{Qed}.\coqdoceol
+\coqdocemptyline
+\coqdocnoindent
+\coqdockw{Notation} "[[ x ]]" := (\coqdocvar{bits\_to\_nat} \coqdocvar{x}).\coqdoceol
+\coqdocemptyline
+\coqdocnoindent
+\coqdockw{Lemma} \coqdocvar{binary\_add\_linearity\_1} : \coqdoceol
+\coqdocindent{2.00em}
+(\coqdockw{\ensuremath{\forall}} (\coqdocvar{b} : \coqdocvar{bitstr}), \coqdocvar{bits\_to\_nat} ([\coqdocvar{O}] +.+ \coqdocvar{b}) = \coqdocvar{bits\_to\_nat} \coqdocvar{b} \ensuremath{\land} \coqdocvar{bits\_to\_nat} (\coqdocvar{b} +.+ [\coqdocvar{O}]) = \coqdocvar{bits\_to\_nat} \coqdocvar{b}) \ensuremath{\rightarrow} \coqdoceol
+\coqdocindent{3.00em}
+\coqdockw{\ensuremath{\forall}} (\coqdocvar{n} : \coqdocvar{nat}), \coqdocvar{bits\_to\_nat} (\coqdocvar{nat\_to\_bits} \coqdocvar{n} +.+ [\coqdocvar{O}]) = \coqdocvar{n} + \coqdocvar{bits\_to\_nat} [\coqdocvar{O}].\coqdoceol
+\coqdocnoindent
+\coqdockw{Proof}.\coqdoceol
+\coqdocindent{1.00em}
+\coqdoctac{intros}.\coqdoceol
+\coqdocindent{1.00em}
+\coqdoctac{simpl}.\coqdoceol
+\coqdocindent{1.00em}
+\coqdoctac{induction} \coqdocvar{n}.\coqdoceol
+\coqdocindent{1.00em}
+\coqdoctac{simpl}. \coqdoctac{reflexivity}.\coqdoceol
+\coqdocindent{1.00em}
+\coqdoctac{simpl}. \coqdoctac{pose} \coqdocvar{proof} (\coqdocvar{bits\_nat\_succ\_eq} \coqdocvar{n}) \coqdockw{as} \coqdocvar{H2}. \coqdoctac{rewrite} \ensuremath{\rightarrow} \coqdocvar{H2}.\coqdoceol
+\coqdocindent{1.00em}
+\coqdoctac{simpl} \coqdoctac{in} \coqdocvar{IHn}. \coqdoctac{pose} \coqdocvar{proof} (\coqdocvar{bits\_nat\_succ\_eq} \coqdocvar{n}) \coqdockw{as} \coqdocvar{H3}. \coqdoctac{simpl} \coqdoctac{in} \coqdocvar{H3}.\coqdoceol
+\coqdocindent{1.00em}
+\coqdoctac{rewrite} \ensuremath{\rightarrow} \coqdocvar{Nat.add\_comm} \coqdoctac{in} \coqdocvar{IHn}. \coqdoctac{rewrite} \ensuremath{\rightarrow} \coqdocvar{Nat.add\_0\_l} \coqdoctac{in} \coqdocvar{IHn}.\coqdoceol
+\coqdocindent{1.00em}
+\coqdoctac{rewrite} \ensuremath{\rightarrow} \coqdocvar{Nat.add\_comm}. \coqdoctac{rewrite} \ensuremath{\rightarrow} \coqdocvar{Nat.add\_0\_l}.\coqdoceol
+\coqdocindent{1.00em}
+\coqdoctac{simpl}.\coqdoceol
+\coqdocindent{1.00em}
+\coqdoctac{rewrite} \coqdocvar{H2}.\coqdoceol
+\coqdocindent{1.00em}
+\coqdoctac{rewrite} \ensuremath{\leftarrow} \coqdocvar{IHn}.\coqdoceol
+\coqdocindent{1.00em}
+\coqdoctac{pose} \coqdocvar{proof} (\coqdocvar{nat\_bits\_succ\_eq} (\coqdocvar{nat\_to\_bits} \coqdocvar{n} +.+ [\coqdocvar{O}])) \coqdockw{as} \coqdocvar{H4}.\coqdoceol
+\coqdocindent{1.00em}
+\coqdoctac{rewrite} \ensuremath{\rightarrow} \coqdocvar{H4}.\coqdoceol
+\coqdocindent{1.00em}
+\coqdoctac{pose} \coqdocvar{proof} (\coqdocvar{H} (\coqdocvar{nat\_to\_bits} \coqdocvar{n})) \coqdockw{as} \coqdocvar{H5}.\coqdoceol
+\coqdocindent{1.00em}
+\coqdoctac{destruct} \coqdocvar{H5}.\coqdoceol
+\coqdocindent{1.00em}
+\coqdoctac{simpl} \coqdoctac{in} \coqdocvar{H1}.\coqdoceol
+\coqdocindent{1.00em}
+\coqdoctac{simpl}.\coqdoceol
+\coqdocindent{1.00em}
+\coqdoctac{rewrite} \ensuremath{\leftarrow} \coqdocvar{H4}.\coqdoceol
+\coqdocindent{1.00em}
+\coqdoctac{rewrite} \ensuremath{\rightarrow} \coqdocvar{H1}.\coqdoceol
+\coqdocindent{1.00em}
+\coqdoctac{pose} \coqdocvar{proof} (\coqdocvar{H} (\coqdocvar{nat\_to\_bits} (\coqdocvar{S} (\coqdocvar{bits\_to\_nat} (\coqdocvar{nat\_to\_bits} \coqdocvar{n}))))) \coqdockw{as} \coqdocvar{H6}.\coqdoceol
+\coqdocindent{1.00em}
+\coqdoctac{destruct} \coqdocvar{H6}.\coqdoceol
+\coqdocindent{1.00em}
+\coqdoctac{rewrite} \ensuremath{\rightarrow} \coqdocvar{H6}.\coqdoceol
+\coqdocindent{1.00em}
+\coqdoctac{rewrite} \ensuremath{\leftarrow} \coqdocvar{H5}.\coqdoceol
+\coqdocindent{1.00em}
+\coqdoctac{rewrite} \coqdocvar{H5}.\coqdoceol
+\coqdocindent{1.00em}
+\coqdoctac{pose} \coqdocvar{proof} \coqdocvar{H6} \coqdockw{as} \coqdocvar{H7}.\coqdoceol
+\coqdocindent{1.00em}
+\coqdoctac{simpl} \coqdoctac{in} \coqdocvar{H6}.\coqdoceol
+\coqdocindent{1.00em}
+\coqdoctac{simpl}.\coqdoceol
+\coqdocindent{1.00em}
+\coqdoctac{rewrite} \ensuremath{\leftarrow} \coqdocvar{H1}.\coqdoceol
+\coqdocindent{1.00em}
+\coqdoctac{rewrite} \coqdocvar{IHn}.\coqdoceol
+\coqdocindent{1.00em}
+\coqdoctac{simpl}.\coqdoceol
+\coqdocindent{1.00em}
+\coqdoctac{rewrite} \coqdocvar{H2}.\coqdoceol
+\coqdocindent{1.00em}
+\coqdoctac{simpl}.\coqdoceol
+\coqdocindent{1.00em}
+\coqdoctac{pose} \coqdocvar{proof} (\coqdocvar{nat\_bits\_succ\_eq} (\coqdocvar{nat\_to\_bits} \coqdocvar{n})) \coqdockw{as} \coqdocvar{H8}.\coqdoceol
+\coqdocindent{1.00em}
+\coqdoctac{rewrite} \ensuremath{\leftarrow} \coqdocvar{H8}.\coqdoceol
+\coqdocindent{1.00em}
+\coqdoctac{rewrite} \ensuremath{\leftarrow} \coqdocvar{H1}.\coqdoceol
+\coqdocindent{1.00em}
+\coqdoctac{rewrite} \ensuremath{\rightarrow} \coqdocvar{IHn}.\coqdoceol
+\coqdocindent{1.00em}
+\coqdoctac{reflexivity}.\coqdoceol
+\coqdocnoindent
+\coqdockw{Qed}.\coqdoceol
+\coqdocemptyline
+\coqdocnoindent
+\coqdockw{Definition} \coqdocvar{str1} := \coqdocvar{nat\_to\_bits} 2.\coqdoceol
+\coqdocnoindent
+\coqdockw{Definition} \coqdocvar{str2} := \coqdocvar{nat\_to\_bits} 1.\coqdoceol
+\coqdocnoindent
+\coqdockw{Compute} (\coqdocvar{bit\_add} \coqdocvar{str1} \coqdocvar{str2}).\coqdoceol
+\coqdocemptyline
+\coqdocnoindent
+\coqdockw{Theorem} \coqdocvar{bit\_nat\_correspondance} : \coqdockw{\ensuremath{\forall}} (\coqdocvar{b} \coqdocvar{c} : \coqdocvar{bitstr}), [[ \coqdocvar{b} +.+ \coqdocvar{c} ]] = [[ \coqdocvar{b} ]] + [[ \coqdocvar{c} ]].\coqdoceol
+\coqdocnoindent
+\coqdockw{Proof}.\coqdoceol
+\coqdocindent{1.00em}
+\coqdoctac{intros}.\coqdoceol
+\coqdocindent{1.00em}
+\coqdoctac{induction} \coqdocvar{b}.\coqdoceol
+\coqdocindent{1.00em}
+\coqdoctac{induction} \coqdocvar{c}.\coqdoceol
+\coqdocindent{1.00em}
+\coqdoctac{simpl}. \coqdoctac{reflexivity}.\coqdoceol
+\coqdocindent{1.00em}
+\coqdoctac{destruct} \coqdocvar{a}.\coqdoceol
+\coqdocindent{1.00em}
+\coqdocvar{all}: \coqdoctac{simpl}.\coqdoceol
+\coqdocindent{1.00em}
+\coqdoctac{repeat} (\coqdoctac{rewrite} \ensuremath{\rightarrow} \coqdocvar{Nat.add\_assoc} || \coqdoctac{rewrite} \ensuremath{\rightarrow} \coqdocvar{Nat.add\_0\_l} || \coqdoctac{rewrite} \ensuremath{\rightarrow} \coqdocvar{Nat.add\_comm}).\coqdoceol
+\coqdocindent{1.00em}
+\coqdoctac{reflexivity}.\coqdoceol
+\coqdocindent{1.00em}
+\coqdoctac{reflexivity}.\coqdoceol
+\coqdocindent{1.00em}
+\coqdoctac{destruct} \coqdocvar{a}.\coqdoceol
+\coqdocindent{1.00em}
+\coqdoctac{auto}.\coqdoceol
+\coqdocindent{1.00em}
+\coqdoctac{simpl}.\coqdoceol
+\coqdocindent{1.00em}
+\coqdoctac{rewrite} \ensuremath{\rightarrow} \coqdocvar{Nat.add\_assoc}.\coqdoceol
+\coqdocindent{1.00em}
+\coqdoctac{unfold} \coqdocvar{bit\_add}.\coqdoceol
+\coqdocindent{1.00em}
+\coqdoctac{auto}.\coqdoceol
+\coqdocindent{1.00em}
+\coqdoctac{simpl}.\coqdoceol
+\coqdocindent{1.00em}
+\coqdoctac{auto}.\coqdoceol
+\coqdocindent{1.00em}
+\coqdoctac{unfold} \coqdocvar{bit\_add}.\coqdoceol
+\coqdocindent{1.00em}
+\coqdoctac{unfold} \coqdocvar{bit\_inc}.\coqdoceol
+\coqdocindent{1.00em}
+\coqdoctac{auto}.\coqdoceol
+\coqdocindent{1.00em}
+\coqdoctac{simpl}.\coqdoceol
+\coqdocindent{1.00em}
+\coqdoctac{unfold} \coqdocvar{bits\_to\_nat}.\coqdoceol
+\coqdocindent{1.00em}
+\coqdoctac{unfold} \coqdocvar{bits\_to\_nat}.\coqdoceol
+\coqdocindent{1.00em}
+\coqdoctac{unfold} \coqdocvar{bit\_add}.\coqdoceol
+\coqdocindent{1.00em}
+\coqdoctac{simpl}.\coqdoceol
+\coqdocindent{1.00em}
+\coqdoctac{auto}.\coqdoceol
+\coqdocindent{1.00em}
+\coqdoctac{induction} \coqdocvar{c}.\coqdoceol
+\coqdocindent{1.00em}
+\coqdoctac{simpl}. \coqdoctac{reflexivity}.\coqdoceol
+\coqdocindent{1.00em}
+\coqdoctac{auto}.\coqdoceol
+\coqdocindent{1.00em}
+\coqdocvar{omega}.\coqdoceol
+\coqdocindent{1.00em}
+\coqdoctac{rewrite} \ensuremath{\leftarrow} \coqdocvar{IHb}.\coqdoceol
+\coqdocindent{1.00em}
+\coqdoctac{rewrite} \ensuremath{\rightarrow} \coqdocvar{Nat.add\_comm}.\coqdoceol
+\coqdocemptyline
+\coqdocindent{1.00em}
+\coqdoctac{rewrite} \ensuremath{\rightarrow} \coqdocvar{IHb}.\coqdoceol
+\coqdocemptyline
+\coqdocindent{1.00em}
+\coqdoctac{auto}.\coqdoceol
+\coqdocindent{1.00em}
+\coqdoctac{simpl}\coqdoceol
+\coqdocnoindent
+\coqdockw{Lemma} \coqdocvar{bit\_add\_succ} : \coqdockw{\ensuremath{\forall}} (\coqdocvar{a} \coqdocvar{b} : \coqdocvar{bitstr}), [[\coqdocvar{a}]] = [[\coqdocvar{b}]] \ensuremath{\rightarrow} [[ (\coqdocvar{bit\_inc} \coqdocvar{a}) +.+ \coqdocvar{b} ]] = [[ \coqdocvar{bit\_inc} (\coqdocvar{a} +.+ \coqdocvar{b}) ]].\coqdoceol
+\coqdocnoindent
+\coqdockw{Proof}.\coqdoceol
+\coqdocindent{1.00em}
+\coqdoctac{intros}.\coqdoceol
+\coqdocindent{1.00em}
+\coqdoctac{unfold} \coqdocvar{bits\_to\_nat}.\coqdoceol
+\coqdocindent{1.00em}
+\coqdoctac{rewrite} \coqdocvar{H}.\coqdoceol
+\coqdocindent{1.00em}
+\coqdoctac{induction} \coqdocvar{b}.\coqdoceol
+\coqdocindent{1.00em}
+\coqdoctac{unfold} \coqdocvar{bit\_inc}. \coqdoctac{simpl}.\coqdoceol
+\coqdocindent{1.00em}
+\coqdoctac{reflexivity}.\coqdoceol
+\coqdocemptyline
+\coqdocindent{1.50em}
+\coqdoctac{unfold} \coqdocvar{bit\_add}.\coqdoceol
+\coqdocindent{1.50em}
+\coqdoctac{simpl}.\coqdoceol
+\coqdocindent{1.50em}
+\coqdoctac{destruct} \coqdocvar{b}.\coqdoceol
+\coqdocindent{1.50em}
+\coqdoctac{unfold} \coqdocvar{bit\_inc}.\coqdoceol
+\coqdocindent{1.00em}
+\coqdoctac{reflexivity}.\coqdoceol
+\coqdocemptyline
+\coqdocindent{1.00em}
+\coqdoctac{destruct} \coqdocvar{b}.\coqdoceol
+\coqdocindent{1.00em}
+\coqdoctac{unfold} \coqdocvar{bit\_inc}.\coqdoceol
+\coqdocindent{1.00em}
+\coqdocvar{all}: \coqdoctac{simpl}.\coqdoceol
+\coqdocindent{1.00em}
+\coqdoctac{induction} \coqdocvar{a}.\coqdoceol
+\coqdocindent{2.00em}
+\coqdoctac{simpl}.\coqdoceol
+\coqdocindent{2.00em}
+\coqdoctac{destruct} \coqdocvar{b}.\coqdoceol
+\coqdocnoindent
+\coqdockw{Theorem} \coqdocvar{nat\_to\_bit\_add\_hom} : \coqdockw{\ensuremath{\forall}} (\coqdocvar{n} \coqdocvar{m} : \coqdocvar{nat}), \coqdocvar{nat\_to\_bits} (\coqdocvar{n} + \coqdocvar{m}) = \coqdocvar{bit\_add} (\coqdocvar{nat\_to\_bits} \coqdocvar{n}) (\coqdocvar{nat\_to\_bits} \coqdocvar{m}).\coqdoceol
+\coqdocnoindent
+\coqdockw{Proof}.\coqdoceol
+\coqdocindent{1.00em}
+\coqdoctac{intros}.\coqdoceol
+\coqdocindent{1.00em}
+\coqdoctac{induction} \coqdocvar{n}.\coqdoceol
+\coqdocindent{1.00em}
+- \coqdoctac{simpl}. \coqdoctac{reflexivity}.\coqdoceol
+\coqdocindent{1.00em}
+- \coqdoctac{simpl}. \coqdoctac{rewrite} \coqdocvar{IHn}.\coqdoceol
+\coqdocindent{2.00em}
+\coqdoctac{induction} \coqdocvar{m}.\coqdoceol
+\coqdocemptyline
+\coqdocnoindent
+\coqdockw{Theorem} \coqdocvar{bit\_to\_nat\_add\_hom} : \coqdockw{\ensuremath{\forall}} (\coqdocvar{a} \coqdocvar{b} : \coqdocvar{bitstr}), \coqdocvar{bits\_to\_nat} (\coqdocvar{bit\_add} \coqdocvar{a} \coqdocvar{b}) = (\coqdocvar{bits\_to\_nat} \coqdocvar{a}) + (\coqdocvar{bits\_to\_nat} \coqdocvar{b}).\coqdoceol
+\coqdocnoindent
+\coqdockw{Proof}.\coqdoceol
+\coqdocemptyline
+\coqdocnoindent
+\coqdockw{Theorem} \coqdocvar{idempotent\_nat} : \coqdockw{\ensuremath{\forall}} (\coqdocvar{n} : \coqdocvar{nat}), \coqdocvar{bits\_to\_nat} (\coqdocvar{nat\_to\_bits} \coqdocvar{n}) = \coqdocvar{n}.\coqdoceol
+\coqdocnoindent
+\coqdockw{Proof}.\coqdoceol
+\coqdocindent{1.00em}
+\coqdoctac{intros} \coqdocvar{n}.\coqdoceol
+\coqdocindent{1.00em}
+\coqdoctac{induction} \coqdocvar{n}.\coqdoceol
+\coqdocindent{1.00em}
+\coqdoctac{simpl}. \coqdoctac{reflexivity}.\coqdoceol
+\coqdocindent{1.00em}
+\coqdoctac{simpl}.\coqdoceol
+\coqdocindent{1.00em}
+\coqdoctac{pose} \coqdocvar{proof} (\coqdocvar{bits\_nat\_succ\_eq} \coqdocvar{n}) \coqdockw{as} \coqdocvar{H1}.\coqdoceol
+\coqdocindent{1.00em}
+\coqdoctac{pose} \coqdocvar{proof} (\coqdocvar{nat\_bits\_succ\_eq} (\coqdocvar{nat\_to\_bits} \coqdocvar{n})) \coqdockw{as} \coqdocvar{H2}.\coqdoceol
+\coqdocindent{1.00em}
+\coqdoctac{pose} \coqdocvar{proof} (\coqdocvar{nat\_bits\_succ\_eq} (\coqdocvar{nat\_to\_bits} \coqdocvar{n})) \coqdockw{as} \coqdocvar{H3}. \coqdoctac{rewrite} \ensuremath{\rightarrow} \coqdocvar{IHn} \coqdoctac{in} \coqdocvar{H3}.\coqdoceol
+\coqdocindent{1.00em}
+\coqdoctac{rewrite} \coqdocvar{H3}.\coqdoceol
+\coqdocindent{1.00em}
+\coqdoctac{reflexivity}.\coqdoceol
+\coqdocnoindent
+\coqdockw{Qed}.\coqdoceol
+\coqdocemptyline
+\coqdocnoindent
+\coqdockw{Theorem} \coqdocvar{thm\_idk} : \coqdockw{\ensuremath{\forall}} (\coqdocvar{n} : \coqdocvar{nat}) (\coqdocvar{b} : \coqdocvar{bitstr}), \coqdocvar{n} = \coqdocvar{bits\_to\_nat} \coqdocvar{b} \ensuremath{\rightarrow} \coqdocvar{nat\_to\_bits} \coqdocvar{n} = \coqdocvar{b}.\coqdoceol
+\coqdocnoindent
+\coqdockw{Proof}.\coqdoceol
+\coqdocindent{1.00em}
+\coqdoctac{intros} \coqdocvar{n} \coqdocvar{b} \coqdocvar{H}.\coqdoceol
+\coqdocindent{1.00em}
+\coqdoctac{induction} \coqdocvar{b}.\coqdoceol
+\coqdocindent{2.00em}
+\coqdoctac{induction} \coqdocvar{n}.\coqdoceol
+\coqdocindent{2.00em}
+\coqdoctac{rewrite} \coqdocvar{H}. \coqdoctac{simpl}. \coqdoctac{reflexivity}.\coqdoceol
+\coqdocindent{2.00em}
+\coqdoctac{rewrite} \coqdocvar{H}. \coqdoctac{simpl}. \coqdoctac{reflexivity}.\coqdoceol
+\coqdocindent{2.00em}
+\coqdoctac{pose} \coqdocvar{proof} (\coqdocvar{idempotent\_nat} \coqdocvar{n}) \coqdockw{as} \coqdocvar{H2}.\coqdoceol
+\coqdocindent{2.00em}
+\coqdoctac{pose} \coqdocvar{proof} (\coqdocvar{idempotent\_nat} \coqdocvar{n}) \coqdockw{as} \coqdocvar{H3}.\coqdoceol
+\coqdocindent{2.00em}
+\coqdoctac{rewrite} \ensuremath{\rightarrow} \coqdocvar{H} \coqdoctac{in} \coqdocvar{H3}.\coqdoceol
+\coqdocindent{2.00em}
+\coqdoctac{rewrite} \coqdocvar{H}.\coqdoceol
+\coqdocindent{2.00em}
+\coqdoctac{destruct} \coqdocvar{a}.\coqdoceol
+\coqdocindent{3.00em}
+\coqdoctac{simpl}.\coqdoceol
+\coqdocemptyline
+\coqdocnoindent
+\coqdockw{Theorem} \coqdocvar{idempotent\_bits} : \coqdockw{\ensuremath{\forall}} (\coqdocvar{b} : \coqdocvar{bitstr}) (\coqdocvar{n} : \coqdocvar{nat}), \coqdocvar{n} = \coqdocvar{bits\_to\_nat} \coqdocvar{b} \ensuremath{\rightarrow} \coqdocvar{nat\_to\_bits} (\coqdocvar{bits\_to\_nat} \coqdocvar{b}) = \coqdocvar{b}.\coqdoceol
+\coqdocnoindent
+\coqdockw{Proof}.\coqdoceol
+\coqdocindent{1.00em}
+\coqdoctac{intros}.\coqdoceol
+\coqdocindent{1.00em}
+\coqdoctac{pose} \coqdocvar{proof} (\coqdocvar{idempotent\_nat} \coqdocvar{n}) \coqdockw{as} \coqdocvar{H2}.\coqdoceol
+\coqdocindent{1.00em}
+\coqdoctac{pose} \coqdocvar{proof} (\coqdocvar{idempotent\_nat} \coqdocvar{n}) \coqdockw{as} \coqdocvar{H3}. \coqdoctac{rewrite} \ensuremath{\rightarrow} \coqdocvar{H} \coqdoctac{in} \coqdocvar{H3}.\coqdoceol
+\coqdocindent{1.00em}
+\coqdoctac{pose} \coqdocvar{proof} \coqdocvar{H3} \coqdockw{as} \coqdocvar{H4}. \coqdoctac{rewrite} \ensuremath{\leftarrow} \coqdocvar{H} \coqdoctac{in} \coqdocvar{H4}.\coqdoceol
+\coqdocindent{1.00em}
+\coqdoctac{rewrite} \ensuremath{\leftarrow} \coqdocvar{H}.\coqdoceol
+\coqdocindent{1.00em}
+\coqdoctac{simpl}.\coqdoceol
+\coqdocindent{1.00em}
+\coqdoctac{induction} \coqdocvar{b}.\coqdoceol
+\coqdocindent{2.00em}
+- \coqdoctac{simpl}. \coqdoctac{rewrite} \ensuremath{\rightarrow} \coqdocvar{H}. \coqdoctac{simpl}. \coqdoctac{reflexivity}.\coqdoceol
+\coqdocindent{2.00em}
+- \coqdoctac{simpl}. \coqdoctac{rewrite} \ensuremath{\rightarrow} \coqdocvar{H}. \coqdoctac{destruct} \coqdocvar{a}.\coqdoceol
+\coqdocindent{2.00em}
+\coqdocvar{all}: \coqdoctac{simpl}.\coqdoceol
+\coqdocindent{2.00em}
+\coqdocvar{all}: \coqdoctac{repeat} (\coqdoctac{rewrite} \ensuremath{\rightarrow} \coqdocvar{Nat.add\_assoc} || \coqdoctac{rewrite} \ensuremath{\rightarrow} \coqdocvar{Nat.add\_0\_l} || \coqdoctac{rewrite} \ensuremath{\rightarrow} \coqdocvar{Nat.add\_comm}).\coqdoceol
+\coqdocindent{2.00em}
+\coqdoctac{pose} \coqdocvar{proof} (\coqdocvar{bits\_nat\_succ\_eq} (\coqdocvar{bits\_to\_nat} \coqdocvar{b} + \coqdocvar{bits\_to\_nat} \coqdocvar{b})) \coqdockw{as} \coqdocvar{H5}.\coqdoceol
+\coqdocindent{2.00em}
+\coqdoctac{pose} \coqdocvar{proof} (\coqdocvar{bits\_nat\_succ\_eq} (\coqdocvar{bits\_to\_nat} \coqdocvar{b} + \coqdocvar{bits\_to\_nat} \coqdocvar{b})) \coqdockw{as} \coqdocvar{H6}.\coqdoceol
+\coqdocindent{2.00em}
+\coqdoctac{pose} \coqdocvar{proof} \coqdocvar{H} \coqdockw{as} \coqdocvar{H7}. \coqdoctac{simpl} \coqdoctac{in} \coqdocvar{H7}. \coqdoctac{repeat} (\coqdoctac{rewrite} \ensuremath{\rightarrow} \coqdocvar{Nat.add\_assoc} \coqdoctac{in} \coqdocvar{H7} || \coqdoctac{rewrite} \ensuremath{\rightarrow} \coqdocvar{Nat.add\_0\_l} \coqdoctac{in} \coqdocvar{H7} || \coqdoctac{rewrite} \ensuremath{\rightarrow} \coqdocvar{Nat.add\_comm} \coqdoctac{in} \coqdocvar{H7}).\coqdoceol
+\coqdocindent{2.00em}
+\coqdoctac{simpl}.\coqdoceol
+\coqdocindent{2.00em}
+\coqdoctac{rewrite} \ensuremath{\rightarrow} \coqdocvar{H5}.\coqdoceol
+\coqdocindent{2.00em}
+\coqdoctac{pose} \coqdocvar{proof} (\coqdocvar{idempotent\_nat} (\coqdocvar{bits\_to\_nat} \coqdocvar{b} + \coqdocvar{bits\_to\_nat} \coqdocvar{b})) \coqdockw{as} \coqdocvar{H8}.\coqdoceol
+\coqdocindent{2.00em}
+\coqdoctac{pose} \coqdocvar{proof} \coqdocvar{H7} \coqdockw{as} \coqdocvar{H10}.\coqdoceol
+\coqdocindent{2.00em}
+\coqdoctac{rewrite} \ensuremath{\leftarrow} \coqdocvar{H8} \coqdoctac{in} \coqdocvar{H10}.\coqdoceol
+\coqdocindent{2.00em}
+\coqdoctac{pose} \coqdocvar{proof} \coqdocvar{H10} \coqdockw{as} \coqdocvar{H11}.\coqdoceol
+\coqdocindent{2.00em}
+\coqdoctac{rewrite} \ensuremath{\rightarrow} \coqdocvar{H7} \coqdoctac{in} \coqdocvar{H11}.\coqdoceol
+\coqdocindent{2.00em}
+\coqdoctac{pose} \coqdocvar{proof} \coqdocvar{H11} \coqdockw{as} \coqdocvar{H12}.\coqdoceol
+\coqdocindent{2.00em}
+\coqdoctac{pose} \coqdocvar{proof} (\coqdocvar{bits\_nat\_succ\_eq} (\coqdocvar{bits\_to\_nat} \coqdocvar{b} + \coqdocvar{bits\_to\_nat} \coqdocvar{b})) \coqdockw{as} \coqdocvar{H13}.\coqdoceol
+\coqdocindent{2.00em}
+\coqdoctac{rewrite} \ensuremath{\leftarrow} \coqdocvar{H7}.\coqdoceol
+\coqdocindent{2.00em}
+\coqdoctac{pose} \coqdocvar{proof} (\coqdocvar{nat\_bits\_succ\_eq} (\coqdocvar{I} :: \coqdocvar{b})) \coqdockw{as} \coqdocvar{H14}. \coqdoctac{simpl} \coqdoctac{in} \coqdocvar{H14}.\coqdoceol
+\coqdocindent{2.00em}
+\coqdoctac{unfold} \coqdocvar{nat\_to\_bits}. \coqdoctac{simpl}.\coqdoceol
+\coqdocindent{2.00em}
+\coqdoctac{rewrite} \ensuremath{\leftarrow} \coqdocvar{H13}. \coqdoctac{simpl}. \coqdoctac{unfold} \coqdocvar{bit\_inc}. \coqdoctac{simpl}. \coqdoctac{simpl} \coqdoctac{in} \coqdocvar{H13}.\coqdoceol
+\coqdocindent{2.00em}
+\coqdoctac{rewrite} \ensuremath{\rightarrow} \coqdocvar{H11}.\coqdoceol
+\coqdocindent{2.00em}
+\coqdoctac{simpl}.\coqdoceol
+\coqdocindent{2.00em}
+\coqdocvar{all}: \coqdoctac{simpl}.\coqdoceol
+\coqdocindent{2.00em}
+\coqdocvar{all}: \coqdoctac{try} \coqdoctac{rewrite} \coqdocvar{Nat.add\_comm}.\coqdoceol
+\coqdocindent{2.00em}
+\coqdocvar{all}: \coqdoctac{replace} (\coqdocvar{bits\_to\_nat} \coqdocvar{b} + 0 + \coqdocvar{bits\_to\_nat} \coqdocvar{b}) \coqdockw{with} (\coqdocvar{bits\_to\_nat} \coqdocvar{b} + \coqdocvar{bits\_to\_nat} \coqdocvar{b}).\coqdoceol
+\coqdocindent{2.00em}
+\coqdoctac{cbv}.\coqdoceol
+\coqdocindent{2.00em}
+\coqdoctac{rewrite} \ensuremath{\leftarrow} \coqdocvar{H}. \coqdoctac{rewrite} \ensuremath{\leftarrow} \coqdocvar{H2}.\coqdoceol
+\coqdocindent{2.00em}
+\coqdoctac{induction} \coqdocvar{n}.\coqdoceol
+\coqdocindent{2.00em}
+\coqdocvar{all}: \coqdoctac{rewrite} \ensuremath{\leftarrow} \coqdocvar{H}. \coqdoctac{simpl}.\coqdoceol
+\coqdocemptyline
+\coqdocindent{2.00em}
+\coqdoctac{destruct} \coqdocvar{a}.\coqdoceol
+\coqdocindent{2.00em}
+\coqdocvar{all}: \coqdoctac{simpl}.\coqdoceol
+\coqdocindent{1.00em}
+\coqdoctac{induction} \coqdocvar{n}.\coqdoceol
+\coqdocemptyline
+\coqdocindent{1.00em}
+\coqdoctac{induction} \coqdocvar{n}.\coqdoceol
+\coqdocindent{1.00em}
+\coqdoctac{rewrite} \ensuremath{\leftarrow} \coqdocvar{H}. \coqdoctac{simpl}.\coqdoceol
+\coqdocindent{1.00em}
+\coqdoctac{intros} \coqdocvar{b}.\coqdoceol
+\coqdocindent{1.00em}
+\coqdoctac{pose} \coqdocvar{proof} (\coqdocvar{idempotent\_nat} (\coqdocvar{bits\_to\_nat} \coqdocvar{b})) \coqdockw{as} \coqdocvar{H}.\coqdoceol
+\coqdocindent{1.00em}
+\coqdoctac{pose} \coqdocvar{proof} (\coqdocvar{nat\_bits\_succ\_eq} \coqdocvar{b}) \coqdockw{as} \coqdocvar{H2}.\coqdoceol
+\coqdocindent{1.00em}
+\coqdoctac{pose} \coqdocvar{proof} (\coqdocvar{bits\_to\_nat} \coqdocvar{b}) \coqdockw{as} \coqdocvar{n}.\coqdoceol
+\coqdocindent{1.00em}
+\coqdoctac{replace} (\coqdocvar{nat\_to\_bits} (\coqdocvar{bits\_to\_nat} \coqdocvar{b}) = \coqdocvar{b}) \coqdockw{with} (\coqdocvar{bits\_to\_nat} (\coqdocvar{nat\_to\_bits} (\coqdocvar{bits\_to\_nat} \coqdocvar{b})) = \coqdocvar{bits\_to\_nat} \coqdocvar{b}).\coqdoceol
+\coqdocindent{1.00em}
+\coqdoctac{rewrite} \ensuremath{\leftarrow} \coqdocvar{H}.\coqdoceol
+\coqdocindent{1.00em}
+\coqdoctac{simpl}.\coqdoceol
+\coqdocemptyline
+\coqdocnoindent
+\coqdockw{Theorem} \coqdocvar{bits\_num\_bijection} : \coqdockw{\ensuremath{\forall}} (\coqdocvar{n} : \coqdocvar{nat}), \coqdoctac{\ensuremath{\exists}} (\coqdocvar{b} : \coqdocvar{bitstr}), \coqdoceol
+\coqdocnoindent
+\coqdoceol
+\coqdocnoindent
+\coqdockw{Theorem} \coqdocvar{bits\_additive\_identity} : \coqdoceol
+\coqdocnoindent
+\coqdoceol
+\coqdocnoindent
+\coqdockw{Theorem} \coqdocvar{list\_sem\_correctness} : \coqdockw{\ensuremath{\forall}} (\coqdocvar{b} : \coqdocvar{bitstr}) (\coqdocvar{n} : \coqdocvar{nat}), \coqdocvar{bits\_to\_nat} \coqdocvar{b} = \coqdocvar{n} \ensuremath{\rightarrow} \coqdoctac{eval} (\coqdocvar{Lit} \coqdocvar{b}) = \coqdocvar{n}.\coqdoceol
+\coqdocnoindent
+\coqdockw{Proof}.\coqdoceol
+\coqdocemptyline
+\coqdocnoindent
+\coqdockw{Theorem} \coqdocvar{bit\_expr\_add\_hom} : \coqdockw{\ensuremath{\forall}} (\coqdocvar{b1} \coqdocvar{b2} : \coqdocvar{bitstr}) (\coqdocvar{n} \coqdocvar{m} : \coqdocvar{nat}), \coqdoctac{eval} (\coqdocvar{Bin} \coqdocvar{bin\_add} \coqdocvar{b1} \coqdocvar{b2}) = \coqdoctac{eval} ()\end{coqdoccode}
+\end{document}

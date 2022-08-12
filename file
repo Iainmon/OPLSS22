@@ -1,0 +1,16 @@
+\begin{center}
+\begin{tabular}{lc}
+\begin{tabular}[c]{@{}l@{}}$A \wedge \top \equiv A$\\ $A  \vee \bot \equiv A$\end{tabular}                                                                       & Identity laws                \\\\
+\begin{tabular}[c]{@{}l@{}}$A  \vee \top \equiv \top$\\ $A  \wedge \bot \equiv \bot$\end{tabular}                                                                 & Domination laws              \\\\
+\begin{tabular}[c]{@{}l@{}}$A  \vee A \equiv A$\\ $A  \wedge A \equiv A$\end{tabular}                                                                             & Idempotent or tautology laws \\\\
+$\neg (\neg A) \equiv A$                                                                                                                                        & Double negation law          \\\\
+\begin{tabular}[c]{@{}l@{}}$A  \vee B \equiv B \vee A$\\ $A  \wedge B \equiv B \wedge A$\end{tabular}                                                             & Commutative laws             \\\\
+\begin{tabular}[c]{@{}l@{}}$(A \vee B) \vee C \equiv A \vee (B \vee C)$\\ $(A \wedge B) \wedge C \equiv A \wedge (B \wedge C)$\end{tabular}                     & Associative laws             \\\\
+\begin{tabular}[c]{@{}l@{}}$A  \vee (B \wedge C) \equiv (A \vee B) \wedge (A \vee C)$\\ $A  \wedge (B \vee C) \equiv (A \wedge B) \vee (A \wedge C)$\end{tabular} & Distributive laws            \\\\
+\begin{tabular}[c]{@{}l@{}}$\neg (A \wedge B) \equiv  \neg A \vee \neg B$\\ $\neg (A \vee B) \equiv  \neg A \wedge \neg B$\end{tabular}                         & De Morgan's laws             \\\\
+\begin{tabular}[c]{@{}l@{}}$A  \vee (A \wedge B) \equiv A$\\ $A  \wedge (A \vee B) \equiv A$\end{tabular}                                                         & Absorption laws              \\\\
+\begin{tabular}[c]{@{}l@{}}$A  \vee \neg A \equiv \top$\\ $A  \wedge \neg A \equiv \bot$\end{tabular}                                                             & Negation laws               \\\\
+\begin{tabular}[c]{@{}l@{}}$A\to B \equiv \neg A \vee B$\\ $A\to B \equiv \neg B \to \neg A$\end{tabular}                                                             & Implication laws         \\\\    
+\begin{tabular}[c]{@{}l@{}}$A\liff B \equiv (A\to B) \wedge (B \to A)$\\ $A \liff B \equiv (A \wedge B) \vee (\neg A \wedge \neg B)$\end{tabular}                                                             & Biconditional laws         \\      
+\end{tabular}
+\end{center}
