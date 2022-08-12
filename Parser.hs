@@ -1,7 +1,5 @@
 {-# LANGUAGE InstanceSigs #-}
 
-import Debug.Trace (traceShowId)
-
 import Data.Map (Map)
 import qualified Data.Map as Map
 
@@ -43,7 +41,7 @@ alt (P p) (P q) = P (\s -> p s ++ q s)
 
 (+++) :: Parser c a -> Parser c a -> Parser c a
 p +++ q = first (p `alt` q)
-(<|>) = (+++)
+(<|>) = alt -- (+++) -- alt
 
 first :: Parser c a -> Parser c a
 first (P p) = P (\s -> case p s of [] -> []; (x:xs) -> [x])
@@ -78,43 +76,64 @@ prods = Map.findWithDefault []
 data ParseTree a = Rule NT [ParseTree a] | Sym a deriving (Show)
 
 
-symbol :: Eq a => a -> Parser a (ParseTree a)
-symbol a = sat (==a) >>= return . Sym
+-- Generates a parser for terminal symbols
+terminal :: Eq a => a -> Parser a (ParseTree a)
+terminal a = sat (==a) >>= return . Sym
+
+-- Generates a parser for any derivation of a non-terminal
+nonTerminal :: Eq a => CFG a -> NT -> Parser a (ParseTree a)
+nonTerminal g nt = choice (productions g nt) >>= return . Rule nt
+
+-- Generates a parser for a production rule
+production :: Eq a => CFG a -> Production a -> Parser a [ParseTree a]
+production g = sequence . map (symbol g)
+
+-- Generates a parser for each production rule of a non-terminal
+productions :: Eq a => CFG a -> NT -> [Parser a [ParseTree a]]
+productions g = map (production g) . flip prods g
+
+-- Generates a parser for a terminal or non-terminal symbol
+symbol :: Eq a => CFG a -> Either NT a -> Parser a (ParseTree a)
+symbol g (Left nt) = nonTerminal g nt 
+symbol _ (Right a) = terminal a
+
+-- Generates a parser for rules of a grammar and a non-terminal
+makeParser :: Eq a => CFG a -> NT -> Parser a (ParseTree a)
+makeParser = nonTerminal
 
 
-parseProd :: Eq a => CFG a -> Production a -> Parser a [(ParseTree a)]
-parseProd g r = sequence compiled
-  where compiled = map compileP r
-        compileP (Left nt) = consParser g nt
-        compileP (Right a) = symbol a
+-- The type of a grammar and a specified non-terminal
+type Grammar a = (CFG a,NT)
 
-validRule :: Eq a => CFG a -> NT -> Production a -> Bool
-validRule g nt r = r `elem` prods nt g
+-- Generate a parser, given a pair of a grammar and initial non-terminal
+grammarParser :: Eq a => Grammar a -> Parser a (ParseTree a)
+grammarParser (g,nt) = makeParser g nt
 
-parseRule :: Eq a => CFG a -> NT -> Production a -> Parser a (ParseTree a)
-parseRule g s r = do leaves <- parseProd g r
-                     return $ Rule s leaves
--- parseRule g s r = do chlds <- parseProd g r
---                      let roots = map roots chlds in
---                      if (s,roots) `elem` Map.toList g then return $ Rule s leaves
---                                                       else void
+
+parseTrees :: Parser c (ParseTree a) -> [c] -> [ParseTree a]
+parseTrees p w = map fst $ filter (null . snd) $ p <<< w
+
+
+derivations :: Eq a => Grammar a -> [a] -> [ParseTree a]
+derivations = parseTrees . grammarParser
+
 
 
 consParser :: Eq a => CFG a -> NT -> Parser a (ParseTree a)
-consParser g s = choice [parseRule g s prd | prd <- prods s g]
+consParser = makeParser
 
 consGrammar :: [(NT,String)] -> CFG Char
 consGrammar g = Map.fromListWith (++) [(nt,return $ map f prd) | (nt,prd) <- g]
   where f c | c `elem` ['A'..'Z'] = Left  c
             | otherwise           = Right c
 
-g1 = consGrammar [('S',"aSb"),('S',"ab")]
-g1P = consParser g1 'S'
+g1 = consGrammar [('S',"aSb"),('S',"ab"),('S',"T"),('T',"aSb")]
+g1P = makeParser g1 'S'
 
 sRule1 = [Right 'a',Left 'S',Left 'b']
 sRule2 = [Right 'a',Right 'b']
 
-g1SRuleP = parseProd g1 sRule2
+g1SRuleP = production g1 sRule2
 {--
 ghci> parseProd g1 sRule2 <<< "ab"
 [([Sym 'a',Sym 'b'],"")]
