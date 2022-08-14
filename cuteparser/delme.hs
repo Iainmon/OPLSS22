@@ -3,7 +3,7 @@
 import Data.Map (Map)
 import qualified Data.Map as Map
 
-import Data.List (intercalate,find,sortOn)
+import Data.List (intercalate,find)
 import Data.Maybe (maybeToList)
 
 import Debug.Trace (traceStack,traceShowId)
@@ -48,7 +48,7 @@ p +++ q = first (p `alt` q)
 
 (<|>) :: Parser c a -> Parser c a -> Parser c a
 -- p <|> q = alt p q -- p +++ q
-p <|> q = alt p q
+p <|> q = alt p q -- p +++ q
 
 
 
@@ -83,17 +83,8 @@ rotate :: [a] -> [a]
 rotate []     = []
 rotate (x:xs) = xs ++ [x]
 
-prioritize :: [Production a] -> [Production a]
-prioritize ps = sortOn metric ps
-  where metric p = metric' [] p
-          where metric' _ []       = 0
-                metric' p' (x:xs)  = (proj x * (length ps - length p')) + metric' (x:p') xs
-        proj (Left _)  = 1
-        proj (Right _) = 0
-
-
 shuffleProds :: NT -> CFG a -> CFG a
-shuffleProds = Map.update (return . prioritize . rotate)
+shuffleProds = Map.update (return . rotate)
 
 
 data ParseTree a = Rule NT [ParseTree a] | Sym a deriving (Show)
@@ -115,14 +106,11 @@ production g = mapM (symbol g)
 
 -- Generates a parser for each production rule of a non-terminal
 productions :: Eq a => CFG a -> NT -> [Parser a [ParseTree a]]
-productions g nt = map (production g') $ prods nt g'
-  where g' = g -- shuffleProds nt g
--- productions g = map (production g) . flip prods g
-
+productions g = map (production g) . flip prods g
 
 -- Generates a parser for a terminal or non-terminal symbol
 symbol :: Eq a => CFG a -> Either NT a -> Parser a (ParseTree a)
-symbol g (Left nt) = nonTerminal g nt -- (shuffleProds nt g) nt 
+symbol g (Left nt) = nonTerminal (shuffleProds nt g) nt 
 symbol _ (Right a) = terminal a
 
 -- Generates a parser for rules of a grammar and a non-terminal
@@ -190,9 +178,10 @@ makeGrammar :: [(NT,String)] -> NT -> Grammar Char
 makeGrammar g s = (consCFG g,s)
 
 g = makeGrammar (concat rules) 'E'
-  where rules = [ 'E' --> ["N","D","EOE"]
+  where rules = [ 'E' --> ["N","D","FOF"]
+                , 'F' --> ["(E)","E"]
                 -- , 'F' --> ["N","D","(E)"]
-                , 'O' --> ["+","-","*"]
+                , 'O' --> ["+","-","*"," O "]
                 , 'N' --> [return c | c <- ['a'..'z']]
                 , 'D' --> [show n | n <- [0..9]]
                 ]
@@ -222,30 +211,3 @@ ghci> prodRule g1 'S' sRule2 <<< "ab"
 (-->) :: NT -> [a] -> [(NT,a)]
 nt --> []     = []
 nt --> (a:as) = (nt,a) : (nt --> as)
-
-
--- palG = consGrammar [ 'S' --> [ c:'S':c:"" | c <- ['a'..'z']] ]
--- palP = consParser palG
-
-ordLeaves :: ParseTree a -> [a]
-ordLeaves (Sym a)           = [a]
-ordLeaves (Rule _ children) = concatMap ordLeaves children
-
-pstr = fst . head $ consParser g1 'S' <<< "aabb"
-
--- ppCFG :: Show a => CFG a -> String
--- ppCFG g = 
---   where ppRule r = (r:"") ++ " -> " ++ intercalate " | " (map ppProd )
-
--- Lazy/infinite representation
--- data Gram a = NonTer [Either (Gram a) a]
-
-sequence' :: Monad m => [m a] -> m [a]
--- sequence' []     = return []
-sequence' (m:ms) = do a <- m
-                      as <- sequence' ms
-                      return (a:as)
-
-g3 = consCFG [('S',"a"),('S',"Sa")]
-g3P = consParser g3 'S'
-
